@@ -35,6 +35,14 @@ pipeline {
                 }
             }
         }
+
+        stage('Deploy to Nexus') {
+            steps {
+                dir('achat') {
+                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" deploy -DskipTests'
+                }
+            }
+        }
     }
 
     post {
