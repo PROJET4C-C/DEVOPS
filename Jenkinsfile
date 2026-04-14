@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" deploy -DskipTests'
+                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" deploy -DskipTests -s C:\\Users\\jemai\\.m2\\settings.xml'
                 }
             }
         }
