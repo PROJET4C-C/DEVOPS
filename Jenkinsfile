@@ -5,7 +5,7 @@ pipeline {
         stage('Build') {
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" clean compile'
+                    bat "mvn clean compile"
                 }
             }
         }
@@ -13,7 +13,7 @@ pipeline {
         stage('Test') {
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" test'
+                    bat "mvn test"
                 }
             }
         }
@@ -22,7 +22,7 @@ pipeline {
             steps {
                 dir('achat') {
                     withSonarQubeEnv('SonarQube') {
-                        bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" sonar:sonar -Dsonar.projectKey=achat'
+                        bat "mvn sonar:sonar -Dsonar.projectKey=achat"
                     }
                 }
             }
@@ -31,7 +31,7 @@ pipeline {
         stage('Package') {
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" package -DskipTests'
+                    bat "mvn package -DskipTests"
                 }
             }
         }
@@ -39,7 +39,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" deploy -DskipTests'
+                    bat "mvn deploy -DskipTests"
                 }
             }
         }
