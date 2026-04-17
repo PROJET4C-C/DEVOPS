@@ -45,6 +45,20 @@ pipeline {
             }
         }
     }
+    stage('Deploy to Nexus') {
+            steps {
+                dir('achat') {
+                    echo 'Déploiement sur Nexus...'
+                    withCredentials([usernamePassword(
+                        credentialsId: 'nexus-credentials',
+                        usernameVariable: 'NEXUS_USER',
+                        passwordVariable: 'NEXUS_PASS'
+                    )]) {
+                        sh 'mvn deploy -DskipTests -Dusername=$NEXUS_USER -Dpassword=$NEXUS_PASS'
+                    }
+                }
+            }
+        }
     post {
         success {
             echo 'Build réussi !'
