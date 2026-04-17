@@ -57,6 +57,7 @@ pipeline {
         }
     }
     post {
+        success {
             echo 'Build réussi !'
         }
         failure {
