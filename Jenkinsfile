@@ -54,7 +54,7 @@ pipeline {
                         usernameVariable: 'NEXUS_USER',
                         passwordVariable: 'NEXUS_PASS'
                     )]) {
-                        sh 'mvn deploy -DskipTests -Dusername=$NEXUS_USER -Dpassword=$NEXUS_PASS'
+                    sh 'mvn deploy -DskipTests -Dusername=$NEXUS_USER -Dpassword=$NEXUS_PASS'
                     }
                 }
             }
