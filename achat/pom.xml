@@ -6,46 +6,48 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <!-- Parent Spring Boot -->
+    <!-- Spring Boot Parent -->
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.5.3</version>
+        <version>2.7.18</version>
         <relativePath/>
     </parent>
 
-    <!-- Infos projet -->
+    <!-- Project Info -->
     <groupId>tn.esprit.rh</groupId>
     <artifactId>achat</artifactId>
     <version>1.0</version>
-    <name>achat</name>
-    <description>Projet DevOps avec Jenkins + Nexus + SonarQube</description>
+    <packaging>jar</packaging>
 
-    <!-- Propriétés -->
+    <name>achat</name>
+    <description>DevOps Project Jenkins + Nexus + SonarQube</description>
+
+    <!-- Java Version -->
     <properties>
         <java.version>11</java.version>
-        <maven-jar-plugin.version>3.1.1</maven-jar-plugin.version>
         <sonar.maven.plugin.version>4.0.0.4121</sonar.maven.plugin.version>
     </properties>
 
-    <!-- Dépendances -->
+    <!-- Dependencies -->
     <dependencies>
 
-        <!-- Spring Boot -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-        </dependency>
-
+        <!-- Spring Boot Web -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
 
+        <!-- JPA -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+
         <!-- MySQL -->
         <dependency>
             <groupId>mysql</groupId>
-            <artifactId>mysql-connector-java</artifactId>
+            <artifactId>mysql-connector-j</artifactId>
             <scope>runtime</scope>
         </dependency>
 
@@ -71,33 +73,19 @@
             <version>3.0.0</version>
         </dependency>
 
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>3.0.0</version>
-        </dependency>
-
     </dependencies>
 
-    <!-- Build -->
+    <!-- Build Plugins -->
     <build>
         <plugins>
 
-            <!-- Spring Boot plugin -->
+            <!-- Spring Boot -->
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
 
-            <!-- SonarQube plugin (IMPORTANT) -->
+            <!-- SonarQube -->
             <plugin>
                 <groupId>org.sonarsource.scanner.maven</groupId>
                 <artifactId>sonar-maven-plugin</artifactId>
@@ -107,14 +95,13 @@
         </plugins>
     </build>
 
-    <!-- Déploiement Nexus -->
+    <!-- Nexus Deployment -->
     <distributionManagement>
         <repository>
             <id>nexus</id>
             <url>http://127.0.0.1:8081/repository/maven-releases-achat/</url>
         </repository>
 
-        <!-- OPTIONNEL (recommandé) -->
         <snapshotRepository>
             <id>nexus</id>
             <url>http://127.0.0.1:8081/repository/maven-snapshots-achat/</url>
