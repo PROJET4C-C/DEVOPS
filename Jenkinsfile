@@ -40,9 +40,7 @@ pipeline {
         stage('Deploy to Nexus') {
             steps {
                 dir('achat') {
-                    configFileProvider([configFile(fileId: 'YOUR_FILE_ID', variable: 'MAVEN_SETTINGS')]) {
-                        bat "mvn deploy -s %MAVEN_SETTINGS% -DskipTests"
-                    }
+                    bat "mvn deploy -DskipTests"
                 }
             }
         }
