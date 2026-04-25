@@ -84,7 +84,7 @@
         <distributionManagement>
     <repository>
         <id>nexus-releases</id>
-        <url>http://localhost:8081/repository/my-maven-release-achat/</url>
+        <url>http://localhost:8081/repository/my-maven-releases-achat/</url>
     </repository>
     <snapshotRepository>
         <id>nexus-snapshots</id>
