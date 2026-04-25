@@ -1,5 +1,5 @@
 # Image de base Java 21
-FROM openjdk:21-jdk-slim
+FROM eclipse-temurin:21-jre-jammy
 
 # Répertoire de travail dans le conteneur
 WORKDIR /app
