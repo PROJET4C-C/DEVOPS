@@ -66,11 +66,13 @@ pipeline {
 
      stage('Docker Run') {
             steps {
-                echo 'Lancement avec docker-compose'
-                sh 'docker-compose down || true'
-                sh 'docker-compose up -d'
+                dir('achat') {
+                   echo 'Lancement avec docker-compose'
+                   sh 'docker-compose down || true'
+                   sh 'docker-compose up -d'
                 
     }
+}
 }
     }
     post {
