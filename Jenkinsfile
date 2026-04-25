@@ -59,7 +59,7 @@ pipeline {
             steps {
                 dir('achat') {
                      echo 'Construction de l image Docker...'
-                     sh 'sudo docker build -t achat-app:1.0 .'
+                     sh 'docker build -t achat-app:1.0 .'
         }
     }
 }
@@ -67,9 +67,9 @@ pipeline {
      stage('Docker Run') {
             steps {
                 echo 'Lancement du conteneur...'
-                sh 'sudo docker stop achat-container || true'
-                sh 'sudo docker rm achat-container || true'
-                sh 'sudo docker run -d --name achat-container -p 8090:8080 achat-app:1.0'
+                sh 'docker stop achat-container || true'
+                sh 'docker rm achat-container || true'
+                sh 'docker run -d --name achat-container -p 8090:8080 achat-app:1.0'
     }
 }
     }
