@@ -65,14 +65,14 @@ pipeline {
 }
 
      stage('Docker Run') {
-            steps {
-                dir('achat') {
-                   echo 'Lancement avec docker-compose'
-                   sh 'docker-compose down || true'
-                   sh 'docker-compose up -d'
-                
+    steps {
+        dir('achat') {
+            echo 'Lancement avec Docker Compose...'
+            sh 'docker-compose down --remove-orphans || true'
+            sh 'docker rm -f achat-container mysql-container || true'
+            sh 'docker-compose up -d'
+        }
     }
-}
 }
     }
     post {
