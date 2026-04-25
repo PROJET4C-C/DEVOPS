@@ -12,7 +12,7 @@ services:
       - "3306:3306"
 
   achat-app:
-    image: achat-app:1.0
+    image: achat-app:2.0
     container_name: achat-container
     depends_on:
       - mysql
@@ -22,3 +22,22 @@ services:
       SPRING_DATASOURCE_PASSWORD: password
     ports:
       - "8090:8089"
+  prometheus:
+    image: prom/prometheus
+    container_name: prometheus-container
+    volumes:
+      - ../prometheus.yml:/etc/prometheus/prometheus.yml
+    ports:
+      - "9090:9090"
+    depends_on:
+      - achat-app
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana-container
+    ports:
+      - "3000:3000"
+    depends_on:
+      - prometheus
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin

@@ -1,0 +1,8 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: 'spring-boot-achat'
+    metrics_path: '/SpringMVC/actuator/prometheus'
+    static_configs:
+      - targets: ['achat-container:8089']
