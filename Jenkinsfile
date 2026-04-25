@@ -59,7 +59,7 @@ pipeline {
             steps {
                 dir('achat') {
                      echo 'Construction de l image Docker...'
-                     sh 'docker build -t achat-app:1.0 .'
+                     sh 'docker build -t achat-app:2.0 .'
         }
     }
 }
