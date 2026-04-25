@@ -66,10 +66,10 @@ pipeline {
 
      stage('Docker Run') {
             steps {
-                echo 'Lancement du conteneur...'
-                sh 'docker stop achat-container || true'
-                sh 'docker rm achat-container || true'
-                sh 'docker run -d --name achat-container -p 8090:8080 achat-app:1.0'
+                echo 'Lancement avec docker-compose'
+                sh 'docker-compose down || true'
+                sh 'docker-compose up -d'
+                
     }
 }
     }
