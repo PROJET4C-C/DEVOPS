@@ -60,6 +60,9 @@ pipeline {
 
         stage('Deploy with Docker Compose') {
             steps {
+                // Force cleanup of old containers to avoid naming conflicts
+                bat "docker stop %CONTAINER_NAME% || exit 0"
+                bat "docker rm %CONTAINER_NAME% || exit 0"
                 bat "docker-compose down"
                 bat "docker-compose up -d --build"
             }
