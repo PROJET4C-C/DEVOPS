@@ -71,8 +71,8 @@ pipeline {
         stage('Verify Pipeline') {
             steps {
                 bat "docker ps"
-                // Give it a few seconds to start before curl
-                bat "timeout /t 15"
+                // Use Jenkins native sleep instead of bat timeout
+                sleep 15
                 bat "curl http://localhost:%APP_PORT%"
             }
         }
