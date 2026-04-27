@@ -58,67 +58,38 @@ pipeline {
             }
         }
 
-        stage('Build Docker Image') {
+        stage('Deploy with Docker Compose') {
             steps {
-                dir('achat') {
-                    bat "docker build -t %APP_NAME% ."
-                }
+                bat "docker-compose down"
+                bat "docker-compose up -d --build"
             }
         }
 
-        stage('Stop Old Container') {
-            steps {
-                bat """
-                docker stop %CONTAINER_NAME% || exit 0
-                docker rm %CONTAINER_NAME% || exit 0
-                """
-            }
-        }
-
-        stage('Run Docker Container') {
-            steps {
-                bat """
-                docker run -d ^
-                -p %APP_PORT%:%APP_PORT% ^
-                --name %CONTAINER_NAME% ^
-                %APP_NAME%
-                """
-            }
-        }
-
-        stage('Verify Running Containers') {
+        stage('Verify Pipeline') {
             steps {
                 bat "docker ps"
-            }
-        }
-
-        stage('Verify Application') {
-            steps {
+                // Give it a few seconds to start before curl
+                bat "timeout /t 15"
                 bat "curl http://localhost:%APP_PORT%"
             }
         }
     }
 
     post {
-
         success {
             echo '======================================'
             echo ' PIPELINE SUCCESSFULLY COMPLETED '
-            echo ' Build OK'
-            echo ' Tests OK'
-            echo ' SonarQube OK'
-            echo ' Nexus Deployment OK'
-            echo ' Docker Deployment OK'
+            echo ' Build & Test OK'
+            echo ' SonarQube & Nexus OK'
+            echo ' Docker Compose Deployment OK'
             echo '======================================'
         }
-
         failure {
             echo '======================================'
             echo ' PIPELINE FAILED '
-            echo ' Check Jenkins logs'
+            echo ' Check Jenkins logs for details'
             echo '======================================'
         }
-
         always {
             echo 'Pipeline execution finished.'
         }
