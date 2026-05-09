@@ -1,5 +1,10 @@
 pipeline {
+
     agent any
+
+    tools {
+        dependencyCheck 'DependencyCheck'
+    }
 
     environment {
         APP_NAME = "achat-app"
@@ -10,91 +15,155 @@ pipeline {
     stages {
 
         stage('Checkout') {
+
             steps {
+
                 git branch: 'main',
                 url: 'https://github.com/PROJET4C-C/DEVOPS.git'
+
             }
         }
 
         stage('Build') {
+
             steps {
+
                 dir('achat') {
-                    bat "mvn clean compile"
+
+                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" clean compile'
+
                 }
             }
         }
 
         stage('Test') {
+
             steps {
+
                 dir('achat') {
-                    bat "mvn test"
+
+                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" test'
+
                 }
             }
         }
 
         stage('SonarQube Analysis') {
+
             steps {
+
                 dir('achat') {
+
                     withSonarQubeEnv('SonarQube') {
-                        bat "mvn sonar:sonar -Dsonar.projectKey=achat"
+
+                        bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" sonar:sonar -Dsonar.projectKey=achat'
+
                     }
                 }
             }
         }
 
-        stage('Package') {
+        stage('OWASP Dependency Check') {
+
             steps {
+
                 dir('achat') {
-                    bat "mvn clean package -DskipTests"
+
+                    dependencyCheck additionalArguments: '--scan .',
+                    odcInstallation: 'DependencyCheck'
+
+                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+
+                }
+            }
+        }
+
+        stage('Package') {
+
+            steps {
+
+                dir('achat') {
+
+                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" package -DskipTests'
+
                 }
             }
         }
 
         stage('Deploy to Nexus') {
+
             steps {
-                dir('achat') {
-                    bat "mvn deploy -DskipTests"
+
+                withCredentials([usernamePassword(
+                    credentialsId: 'nexus-creds',
+                    usernameVariable: 'NEXUS_USER',
+                    passwordVariable: 'NEXUS_PASS'
+                )]) {
+
+                    dir('achat') {
+
+                        bat """
+                        set NEXUS_USERNAME=%NEXUS_USER%
+                        set NEXUS_PASSWORD=%NEXUS_PASS%
+
+                        C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd deploy -DskipTests
+                        """
+                    }
                 }
             }
         }
 
         stage('Deploy with Docker Compose') {
+
             steps {
-                // Force cleanup of old containers to avoid naming conflicts
+
                 bat "docker stop %CONTAINER_NAME% || exit 0"
                 bat "docker rm %CONTAINER_NAME% || exit 0"
                 bat "docker-compose down"
                 bat "docker-compose up -d --build"
+
             }
         }
 
         stage('Verify Pipeline') {
+
             steps {
+
                 bat "docker ps"
-                // Use Jenkins native sleep instead of bat timeout
+
                 sleep 15
+
                 bat "curl http://localhost:%APP_PORT%"
+
             }
         }
     }
 
     post {
+
         success {
+
             echo '======================================'
-            echo ' PIPELINE SUCCESSFULLY COMPLETED '
-            echo ' Build & Test OK'
-            echo ' SonarQube & Nexus OK'
-            echo ' Docker Compose Deployment OK'
+            echo ' PIPELINE DEVSECOPS SUCCESS '
+            echo ' Jenkins + SonarQube + Nexus + OWASP '
+            echo ' Docker Deployment SUCCESS '
             echo '======================================'
+
         }
+
         failure {
+
             echo '======================================'
-            echo ' PIPELINE FAILED '
-            echo ' Check Jenkins logs for details'
+            echo ' PIPELINE DEVSECOPS FAILED '
+            echo ' Check Jenkins logs for details '
             echo '======================================'
+
         }
+
         always {
+
             echo 'Pipeline execution finished.'
+
         }
     }
 }
