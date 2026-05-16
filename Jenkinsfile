@@ -6,6 +6,15 @@ pipeline {
         dependencyCheck 'DependencyCheck'
     }
 
+    options {
+        // ✅ Timeout global du pipeline
+        timeout(time: 30, unit: 'MINUTES')
+        // ✅ Garder uniquement les 5 derniers builds
+        buildDiscarder(logRotator(numToKeepStr: '5'))
+        // ✅ Pas de builds parallèles sur la même branche
+        disableConcurrentBuilds()
+    }
+
     environment {
         APP_NAME = "achat-app"
         CONTAINER_NAME = "achat-container"
@@ -23,6 +32,7 @@ pipeline {
         }
 
         stage('Build') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 dir('achat') {
                     bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" clean compile'
@@ -31,6 +41,7 @@ pipeline {
         }
 
         stage('Test') {
+            options { timeout(time: 10, unit: 'MINUTES') }
             steps {
                 dir('achat') {
                     bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" test'
@@ -39,6 +50,7 @@ pipeline {
         }
 
         stage('SonarQube Analysis') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 dir('achat') {
                     withSonarQubeEnv('SonarQube') {
@@ -49,12 +61,11 @@ pipeline {
         }
 
         stage('OWASP Dependency Check') {
+            options { timeout(time: 15, unit: 'MINUTES') }
             steps {
                 dir('achat') {
-                    // ✅ Seuil d'échec si vulnérabilité HIGH ou CRITICAL
                     dependencyCheck additionalArguments: '--scan . --failOnCVSS 7 --format XML --format HTML',
                         odcInstallation: 'DependencyCheck'
-
                     dependencyCheckPublisher pattern: '**/dependency-check-report.xml',
                         failedTotalCritical: 1,
                         unstableTotalHigh: 5
@@ -63,6 +74,7 @@ pipeline {
         }
 
         stage('Package') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 dir('achat') {
                     bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" package -DskipTests'
@@ -71,6 +83,7 @@ pipeline {
         }
 
         stage('Deploy to Nexus') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 withCredentials([usernamePassword(
                     credentialsId: 'nexus-creds',
@@ -89,19 +102,22 @@ pipeline {
         }
 
         stage('Deploy with Docker Compose') {
+            options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 bat "docker stop %CONTAINER_NAME% || exit 0"
                 bat "docker rm %CONTAINER_NAME% || exit 0"
-                bat "docker-compose down"
+                // ✅ Nettoyage complet
+                bat "docker-compose down --remove-orphans"
                 bat "docker-compose up -d --build"
             }
         }
 
         stage('Verify Pipeline') {
+            options { timeout(time: 2, unit: 'MINUTES') }
             steps {
                 bat "docker ps"
                 sleep 15
-                // ✅ Vérifie que l'app répond correctement
+                // ✅ Vérification santé de l'application
                 bat "curl -f http://localhost:%APP_PORT%/actuator/health || exit 1"
             }
         }
@@ -120,6 +136,10 @@ pipeline {
             echo ' PIPELINE DEVSECOPS FAILED '
             echo ' Check Jenkins logs for details '
             echo '======================================'
+            // ✅ Notification email en cas d'échec
+            mail to: 'Jemai.Rihab@esprit.tn',
+                 subject: "Pipeline FAILED : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
+                 body: "Le pipeline a echoue. Verifiez les logs : ${env.BUILD_URL}"
         }
         always {
             echo 'Pipeline execution finished.'
