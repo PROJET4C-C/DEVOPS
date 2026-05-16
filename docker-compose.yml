@@ -5,16 +5,13 @@ services:
     image: mysql:8.0
     container_name: achat_mysql
     environment:
-      # ✅ Variables d'environnement injectées depuis le système
       - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=achatdb
       - MYSQL_USER=${DB_USERNAME}
       - MYSQL_PASSWORD=${DB_PASSWORD}
-    ports:
-      - "3306:3306"
+    # ✅ Port non exposé à l'extérieur — MySQL accessible uniquement en interne
     volumes:
       - db_data:/var/lib/mysql
-    # ✅ Réseau isolé
     networks:
       - achat-network
     healthcheck:
@@ -32,17 +29,15 @@ services:
       - "8090:8090"
     environment:
       - SERVER_PORT=8090
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      # ✅ Credentials injectés depuis variables d'environnement
+      # ✅ allowPublicKeyRetrieval supprimé
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       mysqldb:
         condition: service_healthy
-    # ✅ Réseau isolé
     networks:
       - achat-network
-    # ✅ Limites de ressources
     deploy:
       resources:
         limits:

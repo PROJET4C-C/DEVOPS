@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/secteurActivite")
-@CrossOrigin("*")
 public class SecteurActiviteController {
 
 	@Autowired

@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/operateur")
-@CrossOrigin("*")
 public class OperateurController {
 
 	@Autowired

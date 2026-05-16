@@ -11,7 +11,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/reglement")
-@CrossOrigin("*")
 public class ReglementRestController {
 
     @Autowired

@@ -9,7 +9,6 @@ import java.util.List;
 
 
 @RestController
-@CrossOrigin("*")
 @RequestMapping("/produit")
 public class ProduitRestController {
 
