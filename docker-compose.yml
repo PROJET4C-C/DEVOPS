@@ -5,12 +5,18 @@ services:
     image: mysql:8.0
     container_name: achat_mysql
     environment:
-      - MYSQL_ROOT_PASSWORD=root
+      # ✅ Variables d'environnement injectées depuis le système
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
       - MYSQL_DATABASE=achatdb
+      - MYSQL_USER=${DB_USERNAME}
+      - MYSQL_PASSWORD=${DB_PASSWORD}
     ports:
       - "3306:3306"
     volumes:
       - db_data:/var/lib/mysql
+    # ✅ Réseau isolé
+    networks:
+      - achat-network
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 10s
@@ -18,7 +24,7 @@ services:
       retries: 5
 
   app:
-    build: 
+    build:
       context: ./achat
       dockerfile: Dockerfile
     container_name: achat-container
@@ -27,11 +33,25 @@ services:
     environment:
       - SERVER_PORT=8090
       - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-      - SPRING_DATASOURCE_USERNAME=root
-      - SPRING_DATASOURCE_PASSWORD=root
+      # ✅ Credentials injectés depuis variables d'environnement
+      - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
+      - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
       mysqldb:
         condition: service_healthy
+    # ✅ Réseau isolé
+    networks:
+      - achat-network
+    # ✅ Limites de ressources
+    deploy:
+      resources:
+        limits:
+          memory: 512M
+          cpus: '0.5'
+
+networks:
+  achat-network:
+    driver: bridge
 
 volumes:
   db_data:

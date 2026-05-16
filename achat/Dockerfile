@@ -2,15 +2,24 @@ FROM eclipse-temurin:11-jre-focal
 
 LABEL maintainer="devops-team"
 
-# Expose port 8090 to match user Jenkinsfile APP_PORT
-EXPOSE 8090
+# ✅ Créer un utilisateur non-root dédié
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
-# Set environment variables for the application
-ENV SERVER_PORT=8090
-# We use host.docker.internal fallback so the isolated container can reach MySQL on the Windows host when launched via simple `docker run`
-ENV SPRING_DATASOURCE_URL=jdbc:mysql://host.docker.internal:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+WORKDIR /app
 
 ARG JAR_FILE=target/achat-1.0.jar
-ADD ${JAR_FILE} app.jar
 
-ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app.jar"]
+# ✅ COPY plus sûr que ADD
+COPY ${JAR_FILE} app.jar
+
+# ✅ Donner les droits à l'utilisateur non-root
+RUN chown appuser:appgroup app.jar
+
+# ✅ Basculer vers l'utilisateur non-root
+USER appuser
+
+EXPOSE 8090
+
+ENV SERVER_PORT=8090
+
+ENTRYPOINT ["java", "-Djava.security.egd=file:/dev/./urandom", "-jar", "/app/app.jar"]
