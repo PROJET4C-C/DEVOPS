@@ -10,6 +10,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,18 +21,30 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class DetailFournisseur implements Serializable{
-	private static final long serialVersionUID = 1L;
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long idDetailFournisseur;
-	private String email;
-	@Temporal(TemporalType.DATE)
-	private Date dateDebutCollaboration;
-	private String adresse;
-	private String matricule;
-	@OneToOne(mappedBy="detailFournisseur")
-	@JsonIgnore
-	private Fournisseur fournisseur;
-	
+public class DetailFournisseur implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idDetailFournisseur;
+
+    // ✅ Email masqué — donnée personnelle sensible
+    @JsonIgnore
+    private String email;
+
+    @Temporal(TemporalType.DATE)
+    private Date dateDebutCollaboration;
+
+    // ✅ Adresse masquée — donnée personnelle sensible
+    @JsonIgnore
+    private String adresse;
+
+    // ✅ Matricule masqué — identifiant fiscal sensible
+    @JsonIgnore
+    private String matricule;
+
+    @OneToOne(mappedBy = "detailFournisseur")
+    @JsonIgnore
+    private Fournisseur fournisseur;
 }
