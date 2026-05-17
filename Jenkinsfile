@@ -102,6 +102,16 @@ pipeline {
             }
         }
 
+        stage('Docker Trivy Scan') {
+            options { timeout(time: 10, unit: 'MINUTES') }
+            steps {
+                // Utilise le conteneur Trivy pour scanner l'image de base utilisée dans le Dockerfile
+                // ou l'image construite. Ici on scanne l'image construite par Docker Compose.
+                bat "docker build -t achat-app:latest ./achat"
+                bat "docker run --rm -v //var/run/docker.sock:/var/run/docker.sock aquasec/trivy image --severity HIGH,CRITICAL --no-progress achat-app:latest"
+            }
+        }
+
         stage('Deploy with Docker Compose') {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
