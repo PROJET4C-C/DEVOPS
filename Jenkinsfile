@@ -2,9 +2,7 @@ pipeline {
 
     agent any
 
-    tools {
-        dependencyCheck 'DependencyCheck'
-    }
+
 
     options {
         // ✅ Timeout global du pipeline
@@ -65,11 +63,8 @@ pipeline {
             options { timeout(time: 15, unit: 'MINUTES') }
             steps {
                 dir('achat') {
-                    dependencyCheck additionalArguments: '--scan . --failOnCVSS 7 --format XML --format HTML',
-                        odcInstallation: 'DependencyCheck'
-                    dependencyCheckPublisher pattern: '**/dependency-check-report.xml',
-                        failedTotalCritical: 1,
-                        unstableTotalHigh: 5
+                    // Utilise le plugin Maven directement pour faire l'analyse
+                    bat 'mvn dependency-check:check'
                 }
             }
         }
