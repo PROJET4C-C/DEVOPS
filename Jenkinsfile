@@ -44,20 +44,23 @@ pipeline {
                 }
             }
         }
-stage('OWASP Dependency-Check') {
-    steps {
-        dir('achat') {
-            echo 'Analyse des dépendances OWASP...'
-            dependencyCheck additionalArguments: '--scan ./ --format HTML --format XML', odcInstallation: 'OWASP-DC'
-            dependencyCheckPublisher pattern: '**/dependency-check-report.xml'
+        stage('OWASP Dependency-Check') {
+            steps {	dir('achat') {
+              echo 'Analyse des dépendances OWASP...'
+	      dependencyCheck additionalArguments: '''
+                --scan ./
+                --format HTML
+                --format XML
+                --out ./dependency-check-report
+            ''', odcInstallation: 'OWASP-DC'
+            dependencyCheckPublisher pattern: '**/dependency-check-report/dependency-check-report.xml'
         }
     }
-}
-
-stage('Trivy Scan') {
-    steps {
-        echo 'Scan de l image Docker avec Trivy...'
-        sh 'trivy image --exit-code 0 --severity HIGH,CRITICAL --format table achat-app:2.0'
+  }
+      stage('Trivy Scan') {
+           steps {
+            echo 'Scan de l image Docker avec Trivy...'
+           sh 'trivy image --exit-code 0 --severity HIGH,CRITICAL --format table achat-app:2.0'
     }
 }
     
