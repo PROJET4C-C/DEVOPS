@@ -1,0 +1,26 @@
+# ✅ Secrets — NE JAMAIS PUSHER
+.env
+
+# ✅ Build Maven
+achat/target/
+**/target/
+*.jar
+*.war
+
+# ✅ IDE
+.idea/
+*.iml
+.vscode/
+*.eclipse
+
+# ✅ OS
+.DS_Store
+Thumbs.db
+
+# ✅ Logs
+*.log
+logs/
+
+# ✅ Docker volumes locaux
+grafana_data/
+db_data/

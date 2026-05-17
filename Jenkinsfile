@@ -19,15 +19,16 @@ pipeline {
         APP_NAME = "achat-app"
         CONTAINER_NAME = "achat-container"
         APP_PORT = "8090"
+        // ✅ Email générique pour les notifications - remplacez-le par votre adresse email
+        NOTIFICATION_EMAIL = "admin@example.com"
     }
 
     stages {
 
         stage('Checkout') {
             steps {
-                git branch: 'main',
-                    url: 'https://github.com/PROJET4C-C/DEVOPS.git',
-                    credentialsId: 'github-creds'
+                // ✅ Utilise la configuration SCM générique du projet Jenkins (télécharge automatiquement le dépôt et la branche du déclencheur)
+                checkout scm
             }
         }
 
@@ -35,7 +36,7 @@ pipeline {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" clean compile'
+                    bat 'mvn clean compile'
                 }
             }
         }
@@ -44,7 +45,7 @@ pipeline {
             options { timeout(time: 10, unit: 'MINUTES') }
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" test'
+                    bat 'mvn test'
                 }
             }
         }
@@ -54,7 +55,7 @@ pipeline {
             steps {
                 dir('achat') {
                     withSonarQubeEnv('SonarQube') {
-                        bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" sonar:sonar -Dsonar.projectKey=achat'
+                        bat 'mvn sonar:sonar -Dsonar.projectKey=achat'
                     }
                 }
             }
@@ -77,7 +78,7 @@ pipeline {
             options { timeout(time: 5, unit: 'MINUTES') }
             steps {
                 dir('achat') {
-                    bat '"C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd" package -DskipTests'
+                    bat 'mvn package -DskipTests'
                 }
             }
         }
@@ -94,7 +95,7 @@ pipeline {
                         bat """
                         set NEXUS_USERNAME=%NEXUS_USER%
                         set NEXUS_PASSWORD=%NEXUS_PASS%
-                        C:\\apache-maven-3.9.14\\apache-maven-3.9.14\\bin\\mvn.cmd deploy -DskipTests
+                        mvn deploy -DskipTests
                         """
                     }
                 }
@@ -136,8 +137,8 @@ pipeline {
             echo ' PIPELINE DEVSECOPS FAILED '
             echo ' Check Jenkins logs for details '
             echo '======================================'
-            // ✅ Notification email en cas d'échec
-            mail to: 'Jemai.Rihab@esprit.tn',
+            // ✅ Notification email générique en cas d'échec
+            mail to: env.NOTIFICATION_EMAIL,
                  subject: "Pipeline FAILED : ${env.JOB_NAME} #${env.BUILD_NUMBER}",
                  body: "Le pipeline a echoue. Verifiez les logs : ${env.BUILD_URL}"
         }

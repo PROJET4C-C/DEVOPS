@@ -29,8 +29,8 @@ services:
       - "8090:8090"
     environment:
       - SERVER_PORT=8090
-      # ✅ allowPublicKeyRetrieval supprimé
-      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&serverTimezone=UTC
+      # ✅ allowPublicKeyRetrieval=true activé pour autoriser la connexion MySQL
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb:3306/achatdb?createDatabaseIfNotExist=true&useUnicode=true&characterEncoding=UTF-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC
       - SPRING_DATASOURCE_USERNAME=${DB_USERNAME}
       - SPRING_DATASOURCE_PASSWORD=${DB_PASSWORD}
     depends_on:
@@ -44,9 +44,36 @@ services:
           memory: 512M
           cpus: '0.5'
 
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: achat-prometheus
+    ports:
+      - "9090:9090"
+    volumes:
+      - ./monitoring/prometheus:/etc/prometheus
+    networks:
+      - achat-network
+    depends_on:
+      - app
+
+  grafana:
+    image: grafana/grafana:latest
+    container_name: achat-grafana
+    ports:
+      - "3000:3000"
+    environment:
+      - GF_SECURITY_ADMIN_PASSWORD=admin
+    volumes:
+      - grafana_data:/var/lib/grafana
+    networks:
+      - achat-network
+    depends_on:
+      - prometheus
+
 networks:
   achat-network:
     driver: bridge
 
 volumes:
   db_data:
+  grafana_data:
